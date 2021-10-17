@@ -16,3 +16,4 @@ matplotlib
 nltk
 wordcloud
 
+CSV files in this repo are just samples till Kaho gives me actual samples
