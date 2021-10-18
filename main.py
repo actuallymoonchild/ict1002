@@ -140,6 +140,7 @@ if __name__ == '__main__':
     df_dominant_topic.columns = ['Document_No', 'Dominant_Topic', 'Topic_Percentage_Contrib', 'Keywords', 'Text']
     df_dominant_topic.head(20)
 
+    # Create Wordcloud
     from wordcloud import WordCloud, STOPWORDS
     import matplotlib.colors as mcolors
 
