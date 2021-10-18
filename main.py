@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # NLTK Stopwords
     from nltk.corpus import stopwords
     stop_words = stopwords.words('english')
-    stop_words.extend(['got', 'say', 'use', 'from', 'gt', 'to'])
+    stop_words.extend(['got', 'say', 'use', 'from', 'gt', 'to', 'also', 'that', 'this', 'the'])
 
     # Chapter 2: Importing Sample Data
     # Import Dataset
@@ -107,9 +107,9 @@ if __name__ == '__main__':
     # Compute Coherence Score
     coherence_model_lda = CoherenceModel(model=model, texts=data_lemmatized, dictionary=corpdict, coherence='c_v')
     coherence_lda = coherence_model_lda.get_coherence()
-    print('\nCoherence Score: ', coherence_lda)'''
+    print('\nCoherence Score: ', coherence_lda)
 
-    pprint(model.print_topics())
+    pprint(model.print_topics())'''
 
     def visualiseTopics(ldamodel=None, corpus=corpus, texts = data):
         # Initialize Output
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     df_dominant_topic.columns = ['Document_No', 'Dominant_Topic', 'Topic_Percentage_Contrib', 'Keywords', 'Text']
     df_dominant_topic.head(20)
 
-    '''from wordcloud import WordCloud, STOPWORDS
+    from wordcloud import WordCloud, STOPWORDS
     import matplotlib.colors as mcolors
 
     cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]  # more colors: 'mcolors.XKCD_COLORS'
@@ -171,6 +171,6 @@ if __name__ == '__main__':
     plt.axis('off')
     plt.margins(x=0, y=0)
     plt.tight_layout()
-    plt.show()'''
+    plt.show()
 
 
