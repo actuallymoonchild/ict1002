@@ -5,48 +5,92 @@ Each .csv file has been provided based on the sentiment
 analysis of discussions on Twitter and Reddit.
 
 Columns are:
-Row Number, Text, Date, Link
+Row Number, Text, Score, Date, Link
 '''
 
 # Chapter 1: Initialize data to be 'cleaned'
+import re
+from os import remove
 import pandas as pd
-df = pd.read_csv('redditandtweetsv2.csv')
+df = pd.read_csv('neutral.csv')
 df.head()
 
-# Input all text values into a list.
-# Each text value will be referred to in this code as a document.
-data = df.text.values.tolist()
-
+# Chapter 2: Clean Data
+'''
+Removing Non-English words is crucial in this task of topic modeling
+as the task requires analysis of each topic within each emotion category
+For the simplicity of the task, non-English words are removed. SpaCy,
+nltk and re is used for this chapter.
+'''
 # Initiate cleaning stage.
+# import re
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 import string
+import nltk
+import spacy
+from spacy.language import Language
+from spacy_langdetect import LanguageDetector
 
 # Stopwords to remove 'useless' words
 sWords = stopwords.words('english')
+nltk.download('words', quiet=True)
 sWords.extend(['got', 'say', 'use', 'from', 'nt', 'gt', 'to', 'also', 'that', 'this', 'the'])
-stop_words = set(sWords)
+setStopWords = set(sWords)
 puncExclude = set(string.punctuation)
+engWords = set(nltk.corpus.words.words())
 lemma = WordNetLemmatizer()
 
-# Chapter 2: Clean Data
+# Load Spacy Languge Support
+nlp = spacy.load('en_core_web_sm')
+
+# Assign English Language detector to appropriate function
+def get_lang_detector(nlp, name):
+    return LanguageDetector()
+Language.factory("language_detector", func=get_lang_detector)
+nlp.add_pipe("language_detector", last=True)
+
+# Initialise Data Cleaning
+# Remove URLs
+df['cleanText'] = df['text'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])
+
+# Input all text values into a list.
+# Each text value will be referred to in this code as a document.
+data = df.cleanText.values.tolist()
+
 def clean(doc):
-    word_tokens = word_tokenize(doc)
+    wordTokens = word_tokenize(doc)
+
+    # Remove Non-English words
+    removeNonEng = " ".join(w for w in wordTokens if w.lower() in engWords or not w.isalpha())
 
     # Remove Usernames
-    removeusernames = " ".join(filter(lambda x:x[0]!='@', word_tokens))
-
+    removeusernames = " ".join(filter(lambda x:x[0]!='@', removeNonEng.split()))
+    
     # Remove Punctuations
-    removepunc = ''.join(char for char in removeusernames if char not in puncExclude)
+    removepunc = removeusernames.translate(str.maketrans('', '', string.punctuation))
+    extrapunc = ["“", "’",'"',"'", "`", "≈"]
+    for i in extrapunc:
+        removepunc = removepunc.replace(i, '')
+    
+    print(removepunc.split())
+    # Remove numbers
+    removenum = [x for x in removepunc.split().split() if not isinstance(x, int)]
 
     # Normalize Corpus
-    normaldata = " ".join(lemma.lemmatize(word) for word in removepunc.split())
+    normaldata = " ".join(lemma.lemmatize(word) for word in removenum)
 
     # Remove Stopwords
-    removesw = " ".join([x for x in normaldata.split() if not x.lower() in stop_words])
-
-    return removesw
+    removesw = " ".join([x for x in normaldata.split() if not x.lower() in setStopWords])
+    
+    # Final Removal of Non-English Sentences
+    data1 = nlp(removesw)
+    finalData = ""
+    for sent in data1.sents:
+        if (sent._.language)['language'] == 'en':
+            finalData += str(sent)
+    return finalData
 
 # Data cleaning completed.
 cleanData = [clean(doc).split() for doc in data]
@@ -86,11 +130,11 @@ import matplotlib.colors as mcolors
 # Coloring scheme for each topic
 cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]  # more colors: 'mcolors.XKCD_COLORS'
 
-cloud = WordCloud(stopwords=stop_words,
-                  background_color='black',
+cloud = WordCloud(stopwords=setStopWords,
+                  background_color='white',
                   width=2500,
                   height=1800,
-                  max_words=10,
+                  max_words=25,
                   colormap='tab10',
                   color_func=lambda *args, **kwargs: cols[i],
                   prefer_horizontal=1.0)
@@ -103,7 +147,7 @@ for i, ax in enumerate(axes.flatten()):
     fig.add_subplot(ax)
     topicWords = dict(topics[i][1])
     cloud.generate_from_frequencies(topicWords, max_font_size=300)
-    plt.gca().imshow(cloud)
+    plt.gca().imshow(cloud, interpolation='bilinear')
     plt.gca().set_title('Topic ' + str(i), fontdict=dict(size=16))
     plt.gca().axis('off')
 
