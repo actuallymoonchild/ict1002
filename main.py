@@ -10,9 +10,8 @@ Row Number, Text, Score, Date, Link
 
 # Chapter 1: Initialize data to be 'cleaned'
 import re
-from os import remove
 import pandas as pd
-df = pd.read_csv('neutral.csv')
+df = pd.read_csv('positive.csv')
 df.head()
 
 # Chapter 2: Clean Data
@@ -36,7 +35,7 @@ from spacy_langdetect import LanguageDetector
 # Stopwords to remove 'useless' words
 sWords = stopwords.words('english')
 nltk.download('words', quiet=True)
-sWords.extend(['got', 'say', 'use', 'from', 'nt', 'gt', 'to', 'also', 'that', 'this', 'the'])
+sWords.extend(['got', 'say', 'use', 'from', 'wa', 'nt', 'gt', 'to', 'also', 'that', 'this', 'the'])
 setStopWords = set(sWords)
 puncExclude = set(string.punctuation)
 engWords = set(nltk.corpus.words.words())
@@ -52,34 +51,37 @@ Language.factory("language_detector", func=get_lang_detector)
 nlp.add_pipe("language_detector", last=True)
 
 # Initialise Data Cleaning
+
+# Stage 1: Remove URLs, Newlines, Numbers, Usernames, Punctuations
 # Remove URLs
-df['cleanText'] = df['text'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])
+df['cleantext'] = df['text'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])
+
+# Remove Newlines
+df['cleantext'] = df['cleantext'].replace(r'\n',' ', regex=True)
+df['cleantext'] = df['cleantext'].replace(u'\xa0', u' ', regex=True) 
+
+# Remove Numbers
+df['cleantext'] = df['cleantext'].str.replace('\d+', '',regex=True)
+
+# Remove Usernames
+df['cleantext']= df['cleantext'].str.replace('(@\w+.*?)',"",regex=True)
+
+# Remove Punctuations
+df['cleantext'] = df['cleantext'].str.replace('[^\w\s]','',regex=True)
 
 # Input all text values into a list.
 # Each text value will be referred to in this code as a document.
-data = df.cleanText.values.tolist()
+data = df.cleantext.values.tolist()
 
+# Stage 2: Advanced Cleaning - Remove Stopwords and Non-English sentences & Normalize Corpus
 def clean(doc):
     wordTokens = word_tokenize(doc)
 
     # Remove Non-English words
     removeNonEng = " ".join(w for w in wordTokens if w.lower() in engWords or not w.isalpha())
-
-    # Remove Usernames
-    removeusernames = " ".join(filter(lambda x:x[0]!='@', removeNonEng.split()))
     
-    # Remove Punctuations
-    removepunc = removeusernames.translate(str.maketrans('', '', string.punctuation))
-    extrapunc = ["“", "’",'"',"'", "`", "≈"]
-    for i in extrapunc:
-        removepunc = removepunc.replace(i, '')
-    
-    print(removepunc.split())
-    # Remove numbers
-    removenum = [x for x in removepunc.split().split() if not isinstance(x, int)]
-
     # Normalize Corpus
-    normaldata = " ".join(lemma.lemmatize(word) for word in removenum)
+    normaldata = " ".join(lemma.lemmatize(word) for word in removeNonEng.split())
 
     # Remove Stopwords
     removesw = " ".join([x for x in normaldata.split() if not x.lower() in setStopWords])
@@ -90,7 +92,10 @@ def clean(doc):
     for sent in data1.sents:
         if (sent._.language)['language'] == 'en':
             finalData += str(sent)
+    finalData = finalData.strip()
+
     return finalData
+
 
 # Data cleaning completed.
 cleanData = [clean(doc).split() for doc in data]
@@ -119,16 +124,13 @@ Lda = gensim.models.ldamodel.LdaModel
 # Run and Train LDA model on the DTM
 model = Lda(docTermMatrix, num_topics=10, id2word=corpdict, passes=50)
 
-# Result here
-#print(model.print_topics(num_topics=50, num_words=20))
-
 # Chapter 4: Visualizing each Topic into a Wordcloud
 from matplotlib import pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.colors as mcolors
 
 # Coloring scheme for each topic
-cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]  # more colors: 'mcolors.XKCD_COLORS'
+'''cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]  # more colors: 'mcolors.XKCD_COLORS'
 
 cloud = WordCloud(stopwords=setStopWords,
                   background_color='white',
@@ -155,7 +157,7 @@ plt.subplots_adjust(wspace=0, hspace=0)
 plt.axis('off')
 plt.margins(x=0, y=0)
 plt.tight_layout()
-plt.show()
+plt.show()'''
 
 # Chapter 5: Visualizing Topics via word counts of keywords
 '''from collections import Counter
@@ -187,3 +189,13 @@ for i, ax in enumerate(axes.flatten()):
 fig.tight_layout(w_pad=2)    
 fig.suptitle('Word Count and Importance of Topic Keywords', fontsize=22, y=1.05)    
 plt.show()'''
+
+# Chapter 6: Topic Visualization
+
+import pyLDAvis.gensim_models
+import pyLDAvis
+# Visualize the topics
+
+visualisation = pyLDAvis.gensim_models.prepare(model, docTermMatrix, corpdict)
+pyLDAvis.save_html(visualisation, 'LDA_Visualization.html')
+
