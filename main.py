@@ -130,7 +130,7 @@ from wordcloud import WordCloud, STOPWORDS
 import matplotlib.colors as mcolors
 
 # Coloring scheme for each topic
-'''cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]  # more colors: 'mcolors.XKCD_COLORS'
+cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]  # more colors: 'mcolors.XKCD_COLORS'
 
 cloud = WordCloud(stopwords=setStopWords,
                   background_color='white',
@@ -157,10 +157,10 @@ plt.subplots_adjust(wspace=0, hspace=0)
 plt.axis('off')
 plt.margins(x=0, y=0)
 plt.tight_layout()
-plt.show()'''
+plt.show()
 
 # Chapter 5: Visualizing Topics via word counts of keywords
-'''from collections import Counter
+from collections import Counter
 topics = model.show_topics(formatted=False)
 data_flat = [w for w_list in cleanData for w in w_list]
 counter = Counter(data_flat)
@@ -188,14 +188,14 @@ for i, ax in enumerate(axes.flatten()):
 
 fig.tight_layout(w_pad=2)    
 fig.suptitle('Word Count and Importance of Topic Keywords', fontsize=22, y=1.05)    
-plt.show()'''
+plt.show()
 
 # Chapter 6: Topic Visualization
 
 import pyLDAvis.gensim_models
 import pyLDAvis
-# Visualize the topics
 
+# Visualize the topics
 visualisation = pyLDAvis.gensim_models.prepare(model, docTermMatrix, corpdict)
 pyLDAvis.save_html(visualisation, 'LDA_Visualization.html')
 
