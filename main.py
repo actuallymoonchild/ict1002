@@ -191,7 +191,11 @@ fig.suptitle('Word Count and Importance of Topic Keywords', fontsize=22, y=1.05)
 plt.show()
 
 # Chapter 6: Topic Visualization
-
+'''
+In order to properly present our data using our model,
+pyLDAvis provides a good and interactive way of seeing each topic
+keywords and maps each topic with different graphs.
+'''
 import pyLDAvis.gensim_models
 import pyLDAvis
 
