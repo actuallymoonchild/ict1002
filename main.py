@@ -35,7 +35,7 @@ from spacy_langdetect import LanguageDetector
 # Stopwords to remove 'useless' words
 sWords = stopwords.words('english')
 nltk.download('words', quiet=True)
-sWords.extend(['got', 'say', 'use', 'from', 'wa', 'nt', 'gt', 'to', 'also', 'that', 'this', 'the'])
+sWords.extend(['got', 'say', 'use', 'from', 'gon', 'na', 'wa', 'nt', 'gt', 'to', 'also', 'that', 'this', 'the'])
 setStopWords = set(sWords)
 puncExclude = set(string.punctuation)
 engWords = set(nltk.corpus.words.words())
@@ -143,14 +143,14 @@ cloud = WordCloud(stopwords=setStopWords,
 
 topics = model.show_topics(formatted=False)
 
-fig, axes = plt.subplots(2, 2, figsize=(10,10), sharex=True, sharey=True)
+fig, axes = plt.subplots(2, 5, figsize=(5,5), sharex=True, sharey=True)
 
 for i, ax in enumerate(axes.flatten()):
     fig.add_subplot(ax)
     topicWords = dict(topics[i][1])
     cloud.generate_from_frequencies(topicWords, max_font_size=300)
     plt.gca().imshow(cloud, interpolation='bilinear')
-    plt.gca().set_title('Topic ' + str(i), fontdict=dict(size=16))
+    plt.gca().set_title('Topic ' + str(i+1), fontdict=dict(size=16))
     plt.gca().axis('off')
 
 plt.subplots_adjust(wspace=0, hspace=0)
@@ -173,15 +173,15 @@ for i, topic in topics:
 df = pd.DataFrame(out, columns=['word', 'topic_id', 'importance', 'word_count'])        
 
 # Plot Word Count and Weights of Topic Keywords
-fig, axes = plt.subplots(2, 2, figsize=(16,10), sharey=True, dpi=160)
+fig, axes = plt.subplots(2, 5, figsize=(10,9), sharey=True)
 cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]
 for i, ax in enumerate(axes.flatten()):
     ax.bar(x='word', height="word_count", data=df.loc[df.topic_id==i, :], color=cols[i], width=0.5, alpha=0.3, label='Word Count')
     ax_twin = ax.twinx()
-    ax_twin.bar(x='word', height="importance", data=df.loc[df.topic_id==i, :], color=cols[i], width=0.2, label='Weights')
+    ax_twin.bar(x='word', height="importance", data=df.loc[df.topic_id==i, :], color=cols[i], width=0.3, label='Weights')
     ax.set_ylabel('Word Count', color=cols[i])
-    ax_twin.set_ylim(0, 0.030); ax.set_ylim(0, 3500)
-    ax.set_title('Topic: ' + str(i), color=cols[i], fontsize=16)
+    ax_twin.set_ylim(0, 0.950); ax.set_ylim(0, 20000)
+    ax.set_title('Topic: ' + str(i+1), color=cols[i], fontsize=16)
     ax.tick_params(axis='y', left=False)
     ax.set_xticklabels(df.loc[df.topic_id==i, 'word'], rotation=30, horizontalalignment= 'right')
     ax.legend(loc='upper left'); ax_twin.legend(loc='upper right')
