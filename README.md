@@ -2,18 +2,15 @@
 
 Analyze the topics within each emotion categorizes using topic modeling or detection. 
 
-Libraries Used (For Now):
+Libraries Used:
 
 re
-numpy
 pandas
-pprint
-gensim
-spacy
-warnings
-pyldavis
-matplotlib
 nltk
+string
+spacy
+gensim
+matplotlib
 wordcloud
+pyldavis
 
-CSV files in this repo are just samples till Kaho gives me actual samples
