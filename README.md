@@ -16,10 +16,10 @@ How to Run:
 
 Libraries Used:\
 sys: to take in user input as arguments\
-re: used to clean data\
+re: used to clean data by removing URLs\
 pandas: used to read csv files and store them into a dataframe\
-nltk: used to clean data and natural language processing\
-string: used to clean data \
+nltk: used to clean data by removing stopwords and natural language processing\
+string: used to clean data by removing punctutions \
 spacy: used to clean non-english data with the help of nltk\
 gensim: used to prepare document-term matrix and LDA model for topic modeling\
 matplotlib: used to plot data into a proper structured and clear format\
