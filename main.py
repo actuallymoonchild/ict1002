@@ -8,10 +8,46 @@ Columns are:
 Row Number, Text, Score, Date, Link
 '''
 
+# Chapter 0: Take in User Arguments
+# File will take in 1 integer argument: 1, 2 or 3
+# 1 signifies that the code will present the data based on negative.csv.
+# 2 signifies that the code will present the data based on neutral.csv.
+# 3 signifies that the code will present the data based on positive.csv.
+import sys
+
+try:
+    num = int(sys.argv[1])
+except (ValueError, TypeError, NameError, IndexError):
+    print('Invalid input! Please enter a valid argument')
+    print('main.py <1, 2 or 3> | 1 = negative.csv, 2 = neutral.csv, 3. positive.csv')
+    sys.exit()
+
+''' 
+csv = CSV file to read
+wordlimit = word limit for word count graph
+visoutput = output HTML for topic visualization using pyLDAvis
+'''
+if num == 1:
+    csv = 'negative.csv'
+    wordlimit = 14000
+    visoutput = 'Negative_LDA_Visualization.html'
+elif num == 2:
+    csv = 'neutral.csv'
+    wordlimit = 3500
+    visoutput = 'Neutral_LDA_Visualization.html'
+elif num == 3:
+    csv = 'positive.csv'
+    wordlimit = 20000
+    visoutput = 'Positive_LDA_Visualization.html'
+else:
+    print('Invalid input! Please enter a valid argument: ')
+    print('main.py <1, 2 or 3> | 1 = negative.csv, 2 = neutral.csv, 3. positive.csv')
+    sys.exit()
+
 # Chapter 1: Initialize data to be 'cleaned'
 import re
 import pandas as pd
-df = pd.read_csv('positive.csv')
+df = pd.read_csv(csv)
 df.head()
 
 # Chapter 2: Clean Data
@@ -43,6 +79,8 @@ sWords.extend(['got', 'say', 'use', 'from', 'gon', 'na', 'wa', 'nt', 'gt', 'to',
 setStopWords = set(sWords)
 puncExclude = set(string.punctuation)
 engWords = set(nltk.corpus.words.words())
+
+#
 lemma = WordNetLemmatizer()
 
 # Load Spacy Languge Support
@@ -134,7 +172,7 @@ from wordcloud import WordCloud, STOPWORDS
 import matplotlib.colors as mcolors
 
 # Coloring scheme for each topic
-cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]  # more colors: 'mcolors.XKCD_COLORS'
+cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]
 
 cloud = WordCloud(stopwords=setStopWords,
                   background_color='white',
@@ -185,14 +223,15 @@ for i, ax in enumerate(axes.flatten()):
     ax_twin = ax.twinx()
     ax_twin.bar(x='word', height="importance", data=df.loc[df.topic_id==i, :], color=cols[i], width=0.3, label='Weights')
     ax.set_ylabel('Word Count', color=cols[i])
-    ax_twin.set_ylim(0, 0.950); ax.set_ylim(0, 20000)
+    ax_twin.set_ylim(0, 0.950); ax.set_ylim(0, wordlimit)
     ax.set_title('Topic: ' + str(i+1), color=cols[i], fontsize=16)
     ax.tick_params(axis='y', left=False)
     ax.set_xticklabels(df.loc[df.topic_id==i, 'word'], rotation=30, horizontalalignment= 'right')
     ax.legend(loc='upper left'); ax_twin.legend(loc='upper right')
 
 fig.tight_layout(w_pad=2)    
-fig.suptitle('Word Count and Importance of Topic Keywords', fontsize=22, y=1.05)    
+fig.suptitle('Word Count and Importance of Topic Keywords', fontsize=22, y=1.05)
+plt.subplots_adjust(left = 0.045, right = 0.971, wspace = 0.129, hspace = 0.267)
 plt.show()
 
 # Chapter 6: Topic Visualization
@@ -206,5 +245,5 @@ import pyLDAvis
 
 # Visualize the topics
 visualisation = pyLDAvis.gensim_models.prepare(model, docTermMatrix, corpdict)
-pyLDAvis.save_html(visualisation, 'LDA_Visualization.html')
+pyLDAvis.save_html(visualisation, visoutput)
 
