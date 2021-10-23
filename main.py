@@ -29,6 +29,7 @@ from nltk.tokenize import word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 nltk.download('words', quiet=True)
 nltk.download('punkt', quiet=True)
+nltk.download('wordnet', quiet=True)
 
 # Initiate cleaning stage.
 import string
