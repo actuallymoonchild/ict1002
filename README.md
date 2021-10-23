@@ -11,9 +11,9 @@ How to Run:
 5. Wordcount and Weightage Graph per Topic will then be displayed. You can choose to export the data to .png by clicking the save icon on the bottom left.
 6. LDA Visualization will automatically save a .html file in the current folder. The name of the html output is dependent on the argument input.
 
-# 1 signifies that the code will present the data based on negative.csv.
-# 2 signifies that the code will present the data based on neutral.csv.
-# 3 signifies that the code will present the data based on positive.csv.
+**1 signifies that the code will present the data based on negative.csv.**
+**2 signifies that the code will present the data based on neutral.csv.**
+**3 signifies that the code will present the data based on positive.csv.**
 
 Libraries Used:
 sys: to take in user input as arguments
