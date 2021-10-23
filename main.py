@@ -19,22 +19,25 @@ df.head()
 Removing Non-English words is crucial in this task of topic modeling
 as the task requires analysis of each topic within each emotion category
 For the simplicity of the task, non-English words are removed. SpaCy,
-nltk and re is used for this chapter.
+nltk, re and string are used for this chapter.
 '''
-# Initiate cleaning stage.
-# import re
+
+# Initiate nltk
+import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
+nltk.download('words', quiet=True)
+nltk.download('punkt', quiet=True)
+
+# Initiate cleaning stage.
 import string
-import nltk
 import spacy
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
 # Stopwords to remove 'useless' words
 sWords = stopwords.words('english')
-nltk.download('words', quiet=True)
 sWords.extend(['got', 'say', 'use', 'from', 'gon', 'na', 'wa', 'nt', 'gt', 'to', 'also', 'that', 'this', 'the'])
 setStopWords = set(sWords)
 puncExclude = set(string.punctuation)
@@ -143,6 +146,7 @@ cloud = WordCloud(stopwords=setStopWords,
 
 topics = model.show_topics(formatted=False)
 
+# Plot wordclouds in a 2 x 5 format
 fig, axes = plt.subplots(2, 5, figsize=(5,5), sharex=True, sharey=True)
 
 for i, ax in enumerate(axes.flatten()):
@@ -172,7 +176,7 @@ for i, topic in topics:
 
 df = pd.DataFrame(out, columns=['word', 'topic_id', 'importance', 'word_count'])        
 
-# Plot Word Count and Weights of Topic Keywords
+# Plot Wordcount and Weights of Topic Keywords in 2 x 5 format
 fig, axes = plt.subplots(2, 5, figsize=(10,9), sharey=True)
 cols = [color for name, color in mcolors.TABLEAU_COLORS.items()]
 for i, ax in enumerate(axes.flatten()):
